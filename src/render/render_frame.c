@@ -6,7 +6,7 @@
 /*   By: hshehab <hshehab@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:03:26 by hshehab           #+#    #+#             */
-/*   Updated: 2025/08/03 20:37:29 by hshehab          ###   ########.fr       */
+/*   Updated: 2025/08/04 14:11:00 by hshehab          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -160,7 +160,6 @@ static void	init_ray(t_game *game, t_ray *ray, int x)
 	ray->side_dist_y = (ray->dir_y < 0) ? (game->player.y - ray->map_y)
 		* ray->delta_y : (ray->map_y + 1.0 - game->player.y) * ray->delta_y;
 }
-
 int	render_frame(void *param)
 {
 	t_game	*game;
@@ -168,6 +167,24 @@ int	render_frame(void *param)
 	t_ray	ray;
 
 	game = (t_game *)param;
+	
+	// Handle input first
+	if (game->keys.esc)
+		close_window(game);
+	if (game->keys.w)
+		move_forward(game);
+	if (game->keys.s)
+		move_backward(game);
+	if (game->keys.a)
+		move_left(game);
+	if (game->keys.d)
+		move_right(game);
+	if (game->keys.left)
+		rotate_right(game);
+	if (game->keys.right)
+		rotate_left(game);
+	
+	// Then render
 	draw_background(game);
 	x = 0;
 	while (x < SCREEN_WIDTH)

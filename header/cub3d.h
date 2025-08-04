@@ -6,7 +6,7 @@
 /*   By: hshehab <hshehab@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 18:38:23 by hshehab           #+#    #+#             */
-/*   Updated: 2025/08/03 20:00:50 by hshehab          ###   ########.fr       */
+/*   Updated: 2025/08/04 14:42:04 by hshehab          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,20 @@
 #  define COLOR_FLOOR 0x222222
 #  define COLOR_CEILING 0x888888
 
-#  define MOVE_SPEED 0.05
-#  define ROT_SPEED 0.04
+#  define MOVE_SPEED 0.07
+#  define ROT_SPEED 0.07
 # endif
 
+typedef struct s_keys
+{
+    int w;      // forward
+    int s;      // backward  
+    int a;      // left
+    int d;      // right
+    int left;   // rotate left
+    int right;  // rotate right
+    int esc;    // escape
+} t_keys;
 // ----------------------
 // RGB Color
 // ----------------------
@@ -114,7 +124,7 @@ typedef struct s_game
 	t_config	config;
 	t_map map;       // done
 	t_player player; // done
-	int keys[MAX_KEYS];
+	t_keys  keys;
 }				t_game;
 
 typedef struct s_ray
@@ -131,6 +141,8 @@ typedef struct s_ray
 	double		delta_y;
 	int			side;
 }				t_ray;
+
+
 
 int				ft_strcmp(char *s1, char *s2);
 void			free_matrix(char **matrix);
@@ -150,4 +162,6 @@ int				render_frame(void *param);
 void			free_given_file(t_game *game);
 void			print_matrix(char **arr);
 void			debug_write(char *str);
+
+int	close_window(t_game *game);
 #endif

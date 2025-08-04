@@ -6,7 +6,7 @@
 /*   By: hshehab <hshehab@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 11:16:41 by hshehab           #+#    #+#             */
-/*   Updated: 2025/08/03 20:50:08 by hshehab          ###   ########.fr       */
+/*   Updated: 2025/08/04 14:11:11 by hshehab          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,25 +71,43 @@ int	close_window(t_game *game)
 	exit (0);
 }
 
-int	handle_keypress(int keycode, t_game *game)
+int handle_keypress(int keycode, t_game *game)
 {
-	if (keycode == KEY_ESC)
-		close_window(game);
-	else if (keycode == KEY_W)
-		move_forward(game);
-	else if (keycode == KEY_S)
-		move_backward(game);
-	else if (keycode == KEY_A)
-		move_left(game);
-	else if (keycode == KEY_D)
-		move_right(game);
-	else if (keycode == KEY_LEFT)
-		rotate_right(game);
-	else if (keycode == KEY_RIGHT)
-		rotate_left(game);
-	return (0);
+    if (keycode == KEY_ESC)
+        game->keys.esc = 1;
+    else if (keycode == KEY_W)
+        game->keys.w = 1;
+    else if (keycode == KEY_S)
+        game->keys.s = 1;
+    else if (keycode == KEY_A)
+        game->keys.a = 1;
+    else if (keycode == KEY_D)
+        game->keys.d = 1;
+    else if (keycode == KEY_LEFT)
+        game->keys.left = 1;
+    else if (keycode == KEY_RIGHT)
+        game->keys.right = 1;
+    return (0);
 }
 
+int handle_keyrelease(int keycode, t_game *game)
+{
+    if (keycode == KEY_ESC)
+        game->keys.esc = 0;
+    else if (keycode == KEY_W)
+        game->keys.w = 0;
+    else if (keycode == KEY_S)
+        game->keys.s = 0;
+    else if (keycode == KEY_A)
+        game->keys.a = 0;
+    else if (keycode == KEY_D)
+        game->keys.d = 0;
+    else if (keycode == KEY_LEFT)
+        game->keys.left = 0;
+    else if (keycode == KEY_RIGHT)
+        game->keys.right = 0;
+    return (0);
+}
 void	init_graphics(t_game *game)
 {
 	game->mlx = mlx_init();
@@ -111,8 +129,12 @@ void	init_graphics(t_game *game)
 	if (!game->img_data || game->line_len <= 0 || game->bpp <= 0)
 		error_exit("Failed to get image data address");
 
+	// Initialize key states to 0
+	ft_memset(&game->keys, 0, sizeof(t_keys)); // or manually set all to 0
+	
 	mlx_hook(game->win, 17, 0, close_window, game);
-	mlx_hook(game->win, 2, 1L << 0, handle_keypress, game);
+	mlx_hook(game->win, 2, 1L << 0, handle_keypress, game);    // Key press
+	mlx_hook(game->win, 3, 1L << 1, handle_keyrelease, game);  // Key release
 
 	// ⬇️ Show the north wall texture just to confirm it's working
 	draw_texture_debug(game);
