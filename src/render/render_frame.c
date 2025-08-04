@@ -6,7 +6,7 @@
 /*   By: hshehab <hshehab@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/31 20:03:26 by hshehab           #+#    #+#             */
-/*   Updated: 2025/08/01 19:59:22 by hshehab          ###   ########.fr       */
+/*   Updated: 2025/08/03 20:37:29 by hshehab          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,23 +19,26 @@ static int	rgb(t_color color)
 
 static void	draw_background(t_game *game)
 {
-	int		x;
-	int		y;
-	int		color;
-	char	*pixel;
+	int				x;
+	int				y;
+	int	ceiling_color;
+	int	floor_color;
+	char			*pixel;
+	int				bytes_per_pixel;
+	int	color;
 
+	bytes_per_pixel = game->bpp / 8;
+	ceiling_color = rgb(game->config.ceiling);
+	floor_color = rgb(game->config.floor);
 	y = 0;
 	while (y < SCREEN_HEIGHT)
 	{
-		color = (y < SCREEN_HEIGHT
-				/ 2) ? rgb(game->config.ceiling) : rgb(game->config.floor);
+		color = (y < SCREEN_HEIGHT / 2) ? ceiling_color : floor_color;
 		x = 0;
 		while (x < SCREEN_WIDTH)
 		{
-			pixel = game->img_data + (y * game->line_len) + (x * (game->bpp
-						/ 8));
-			if (pixel >= game->img_data + game->line_len * SCREEN_HEIGHT)
-				error_exit("Image write overflow");
+			pixel = game->img_data + (y * game->line_len) + (x
+					* bytes_per_pixel);
 			*(unsigned int *)pixel = color;
 			x++;
 		}
@@ -45,31 +48,72 @@ static void	draw_background(t_game *game)
 
 static void	draw_wall_strip(t_game *game, t_ray *ray, int x)
 {
-	double	perp_dist;
-	int		line_height;
-	int		start;
-	int		end;
-	int		y;
-	int		color;
-	char	*pixel;
+	int				line_height;
+	int				start;
+	int				end;
+	int				y;
+	int				tex_x;
+	int				tex_y;
+	double			step;
+	double			tex_pos;
+	unsigned int	color;
+	char			*tex_pixel;
+	t_texture		*tex;
+	double			perp_dist;
+	int				tex_index;
+	char			*pixel;
 
-	if (ray->side == 0)
-		perp_dist = ray->side_dist_x - ray->delta_x;
-	else
-		perp_dist = ray->side_dist_y - ray->delta_y;
+	double wall_x; // exact point of wall hit
+	// 1. Calculate perpendicular distance to wall to avoid fish-eye
+	perp_dist = (ray->side == 0) ? (ray->side_dist_x
+			- ray->delta_x) : (ray->side_dist_y - ray->delta_y);
 	line_height = (int)(SCREEN_HEIGHT / perp_dist);
 	start = -line_height / 2 + SCREEN_HEIGHT / 2;
-	end = line_height / 2 + SCREEN_HEIGHT / 2;
 	if (start < 0)
 		start = 0;
+	end = line_height / 2 + SCREEN_HEIGHT / 2;
 	if (end >= SCREEN_HEIGHT)
 		end = SCREEN_HEIGHT - 1;
-	color = (ray->side == 0) ? 0x0010FF : 0x110F00;
+	// 2. Calculate exact wall hit coordinate (0.0 to 1.0)
+	if (ray->side == 0)
+		wall_x = game->player.y + perp_dist * ray->dir_y;
+	else
+		wall_x = game->player.x + perp_dist * ray->dir_x;
+	wall_x -= floor(wall_x);
+	// 3. Determine texture index (0=NO,1=SO,2=WE,3=EA)
+	if (ray->side == 0 && ray->dir_x > 0)
+		tex_index = 1; // SO
+	else if (ray->side == 0 && ray->dir_x < 0)
+		tex_index = 0; // NO
+	else if (ray->side == 1 && ray->dir_y > 0)
+		tex_index = 3; // EA
+	else
+		tex_index = 2; // WE
+	tex = &game->config.textures[tex_index];
+	// 4. Calculate x coordinate on the texture
+	tex_x = (int)(wall_x * (double)tex->width);
+	if ((ray->side == 0 && ray->dir_x > 0) || (ray->side == 1
+			&& ray->dir_y < 0))
+		tex_x = tex->width - tex_x - 1;
+	// 5. Calculate step to increase texture y coordinate per screen pixel
+	step = 1.0 * tex->height / line_height;
+	// 6. Starting texture y coordinate
+	tex_pos = (start - SCREEN_HEIGHT / 2 + line_height / 2) * step;
 	y = start;
 	while (y < end)
 	{
+		tex_y = ((int)tex_pos) % tex->height;
+		if (tex_y < 0)
+			tex_y = 0; // optional safety
+		// get pointer to pixel color in texture img_data
+		tex_pixel = tex->img_data + (tex_y * tex->line_len) + (tex_x * (tex->bpp
+					/ 8));
+		// read pixel color as unsigned int
+		color = *(unsigned int *)tex_pixel;
+		// write color to screen image buffer
 		pixel = game->img_data + (y * game->line_len) + (x * (game->bpp / 8));
 		*(unsigned int *)pixel = color;
+		tex_pos += step;
 		y++;
 	}
 }

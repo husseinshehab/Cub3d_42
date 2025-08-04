@@ -6,35 +6,12 @@
 /*   By: hshehab <hshehab@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 19:53:15 by hshehab           #+#    #+#             */
-/*   Updated: 2025/08/01 19:08:10 by hshehab          ###   ########.fr       */
+/*   Updated: 2025/08/03 20:36:46 by hshehab          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../../header/cub3d.h"
 
-int	is_empty_line(char *line)
-{
-	while (*line)
-	{
-		if (*line != ' ' && *line != '\n')
-			return (0);
-		line++;
-	}
-	return (1);
-}
-
-int	is_map_line(char *line)
-{
-	while (*line)
-	{
-		if (*line == '1' || *line == '0')
-			return (1);
-		else if (*line != ' ')
-			return (0);
-		line++;
-	}
-	return (0);
-}
 
 int	ft_strcmp(char *s1,char *s2)
 {
@@ -69,21 +46,21 @@ void	init_game(t_game *game)
 	game->win = NULL;
 	game->img = NULL;
 	game->img_data = NULL;
-	game->bpp = 0;
+	game->bpp = 32;
 	game->line_len = 0;
 	game->endian = 0;
-	game->config.no_path = NULL;
-	game->config.so_path = NULL;
-	game->config.we_path = NULL;
-	game->config.ea_path = NULL;
-	game->config.floor.r = -1;
-	game->config.floor.g = -1;
-	game->config.floor.b = -1;
-	game->config.ceiling.r = -1;
-	game->config.ceiling.g = -1;
-	game->config.ceiling.b = -1;
-	game->config.has_floor = 0;
-	game->config.has_ceiling = 0;
+	game->config.no_path = ft_strdup("./wall1.xpm");
+    game->config.so_path = ft_strdup("./wall2.xpm");
+    game->config.we_path = ft_strdup("./wall3.xpm");
+    game->config.ea_path = ft_strdup("./wall4.xpm");
+	game->config.floor.r = 244;
+	game->config.floor.g = 190;
+	game->config.floor.b = 118;
+	game->config.ceiling.r = 230;
+	game->config.ceiling.g = 150;
+	game->config.ceiling.b = 100;
+	game->config.has_floor = 1;
+	game->config.has_ceiling = 1;
 	i = 0;
 	while (i < 4)
 	{

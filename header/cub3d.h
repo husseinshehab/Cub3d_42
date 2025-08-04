@@ -6,7 +6,7 @@
 /*   By: hshehab <hshehab@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/07/30 18:38:23 by hshehab           #+#    #+#             */
-/*   Updated: 2025/08/01 21:32:16 by hshehab          ###   ########.fr       */
+/*   Updated: 2025/08/03 20:00:50 by hshehab          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@
 # ifndef DEFINES_H
 #  define DEFINES_H
 
-#  define SCREEN_WIDTH 640
-#  define SCREEN_HEIGHT 480
+#  define SCREEN_WIDTH 800
+#  define SCREEN_HEIGHT 700
 #  define KEY_ESC 65307
 #  define KEY_W 119
 #  define KEY_A 97
@@ -32,6 +32,7 @@
 #  define KEY_D 100
 #  define KEY_LEFT 65361
 #  define KEY_RIGHT 65363
+#define MAX_KEYS 256
 
 #  define COLOR_FLOOR 0x222222
 #  define COLOR_CEILING 0x888888
@@ -67,15 +68,15 @@ typedef struct s_texture
 // ----------------------
 typedef struct s_config
 {
-	char		*no_path;
-	char		*so_path;
-	char		*we_path;
-	char		*ea_path;
+	char *no_path; // done
+	char *so_path; // done
+	char *we_path; // done
+	char *ea_path; // done
 	t_texture	textures[4];
-	t_color		floor;
-	t_color		ceiling;
-	int			has_floor;
-	int			has_ceiling;
+	t_color floor;   // done
+	t_color ceiling; // done
+	int has_floor;   // done
+	int has_ceiling; // done
 }				t_config;
 // ----------------------
 // Map Data
@@ -103,16 +104,17 @@ typedef struct s_player
 // ----------------------
 typedef struct s_game
 {
-	void		*mlx;
-	void		*win;
+	void *mlx; // done
+	void *win; // done
 	void		*img;
 	char		*img_data;
 	int			bpp;
 	int			line_len;
-	int			endian;
+	int endian; // done
 	t_config	config;
-	t_map		map;
-	t_player	player;
+	t_map map;       // done
+	t_player player; // done
+	int keys[MAX_KEYS];
 }				t_game;
 
 typedef struct s_ray
@@ -130,20 +132,10 @@ typedef struct s_ray
 	int			side;
 }				t_ray;
 
-void			parse_cub_file(t_game *game, char *filename);
-void			parse_config_line(t_game *game, char *line);
-void			parse_rgb(t_game *game, t_color *color, char *str,
-					char **tokens);
-void			append_map_line(t_map *map, char *line);
-int				validate_config(t_config *config);
-int				validate_map(t_map *map);
-int				is_empty_line(char *line);
-int				is_map_line(char *line);
 int				ft_strcmp(char *s1, char *s2);
 void			free_matrix(char **matrix);
 void			init_game(t_game *game);
 void			print_map(t_map *map);
-int				validate_map1(t_map *map);
 void			init_player(t_game *game);
 void			init_graphics(t_game *game);
 void			move_forward(t_game *game);
@@ -157,5 +149,5 @@ void			error_exit(char *s);
 int				render_frame(void *param);
 void			free_given_file(t_game *game);
 void			print_matrix(char **arr);
-
+void			debug_write(char *str);
 #endif

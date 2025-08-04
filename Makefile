@@ -11,20 +11,19 @@ INCLUDES = -I./game -I./map_parse -I./libft -I./getnextline -I./minilibx-linux
 LIBFT = ./libft/libft.a
 GNL = ./getnextline/getnextline.a
 MLX = ./minilibx-linux
+
 LIBMLX = -L$(MLX) -lmlx -L/usr/lib -lXext -lX11 -lm
 
 # The executable name
 NAME = cub3d
 
 # List of all directories to be built
-DIRS = libft getnextline
+DIRS = libft getnextline ftprint
 
 # Main source files
 SRC = src/main.c \
 		src/free_game.c \
-		src/parse/parse_file.c \
 		src/parse/utils.c \
-		src/parse/validate_map.c \
 		src/render/init_graphics.c \
 		src/render/init_player.c \
 		src/render/movement.c \
